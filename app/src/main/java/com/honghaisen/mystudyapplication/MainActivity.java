@@ -1,6 +1,7 @@
 package com.honghaisen.mystudyapplication;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,7 +18,9 @@ public class MainActivity extends AppCompatActivity {
 
     Button register;
     Button login;
-    EditText et;
+    EditText email;
+    EditText password;
+    DBHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,25 +30,22 @@ public class MainActivity extends AppCompatActivity {
         //instantiate widgets
         login = (Button) findViewById(R.id.login);
         register = (Button) findViewById(R.id.register);
-        et = (EditText) findViewById(R.id.email);
+        email = (EditText) findViewById(R.id.email);
+        password = (EditText) findViewById(R.id.password);
+        db = new DBHelper(this);
 
         //clicker for login
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //pattern for validation
-                String pattern = Values.emailPattern;
-                Pattern p = Pattern.compile(pattern);
-                Matcher m = p.matcher(MainActivity.this.et.getText());
-
-                //if pattern matches the valid email format, then login
-                if (m.matches()) {
+                String email = MainActivity.this.email.getText().toString();
+                String password = MainActivity.this.password.getText().toString();
+                if(db.matches(email, password)) {
                     Intent i = new Intent(MainActivity.this, Second.class);
                     MainActivity.this.startActivity(i);
                 }
-                //if pattern not matched the valid email format, the show the error message
                 else {
-                    Toast.makeText(MainActivity.this, "invalid email address", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Email or password not match", Toast.LENGTH_SHORT).show();
                 }
             }
         });
