@@ -21,10 +21,10 @@ public class Register extends AppCompatActivity {
     private EditText name;
     private EditText phone;
     private DBHelper db;
-    private boolean isRun = false;
-    private static final char SEPERATOR = '-';
-    private static final int FIRST_SEPERATOR_POSITION = 3;
-    private static final int SECOND_SEPERATOR_POSITION = 7;
+//    private boolean isRun = false;
+    private static final char SEPARATOR = '-';
+    private static final int FIRST_SEPARATOR_POSITION = 3;
+    private static final int SECOND_SEPARATOR_POSITION = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +43,21 @@ public class Register extends AppCompatActivity {
         regBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //If user didn't input anything in email text editor, r
                 if (email.getText().toString().equals("")) {
                     Toast.makeText(Register.this, "please enter your email address", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                //If user didn't input anything in password text editor
                 if (password.getText().toString().equals("")) {
                     Toast.makeText(Register.this, "please enter your password", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Pattern phonePattern = null;
-                Matcher phoneMatcher = null;
-                if (!phone.getText().toString().equals("")) {
-                    phonePattern = Pattern.compile(Values.phonePattern);
-                    phoneMatcher = phonePattern.matcher(phone.getText());
-                }
-                Log.d("register", phone.getText().toString());
+
                 Pattern emailPattern = Pattern.compile(Values.emailPattern);
                 Matcher emailMatcher = emailPattern.matcher(email.getText());
-                //if phone and email matches, insert data into database
-                if (((phoneMatcher != null && phoneMatcher.matches()) || phoneMatcher == null) && emailMatcher.matches()) {
+                //if email is in a validate format, insert data into database
+                if (emailMatcher.matches()) {
                     boolean successInsert = db.insert(email.getText().toString(), password.getText().toString(), name.getText().toString(), phone.getText().toString());
                     if (successInsert) {
                         Intent i = new Intent(Register.this, MainActivity.class);
@@ -71,18 +67,13 @@ public class Register extends AppCompatActivity {
                     }
                 }
                 //if email address's format is invalid
-                else if (!emailMatcher.matches()) {
+                else {
                     Toast.makeText(Register.this, "invalid email address", Toast.LENGTH_SHORT).show();
                     Log.d("register", "invalid email");
                 }
-                //if phone number's format is invalid
-                else if (phoneMatcher != null && !phoneMatcher.matches()) {
-                    Toast.makeText(Register.this, "invalid phone number", Toast.LENGTH_SHORT).show();
-                    Log.d("register", "invalid phone number");
-                }
             }
         });
-
+        //auto formatter for phone number
         phone.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -91,30 +82,35 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isRun) {
-                    isRun = false;
-                    return;
-                }
-                isRun = true;
+//                if (isRun) {
+//                    isRun = false;
+//                    return;
+//                }
+//                isRun = true;
                 Editable phoneNumberEditable = phone.getEditableText();
-
+                Log.d("before", String.valueOf(before));
+                Log.d("count", String.valueOf(count));
                 if (before == 1) {
-                    if (start == FIRST_SEPERATOR_POSITION || start == SECOND_SEPERATOR_POSITION) {
+                    if (start == FIRST_SEPARATOR_POSITION || start == SECOND_SEPARATOR_POSITION) {
                         return;
                     }
                 }
 
                 switch (parsePhoneNumber(phoneNumberEditable.toString())) {
+                    //Not formatted cause one index at least is a separator, except index 3 and index 7, case 1
                     case 1:
                         int oneInvalidSeparatorIndex = getOneInvalidSeparatorIndex(phoneNumberEditable.toString());
                         phoneNumberEditable.delete(oneInvalidSeparatorIndex, oneInvalidSeparatorIndex + 1);
                         break;
+                    //When length equals to first separator index, add '-', case 2
                     case 2:
-                        phoneNumberEditable.insert(FIRST_SEPERATOR_POSITION, String.valueOf('-'));
+                        phoneNumberEditable.insert(FIRST_SEPARATOR_POSITION, String.valueOf(SEPARATOR));
                         break;
+                    //When length equals to second separator index, add '-', case 3
                     case 3:
-                        phoneNumberEditable.insert(SECOND_SEPERATOR_POSITION, String.valueOf('-'));
+                        phoneNumberEditable.insert(SECOND_SEPARATOR_POSITION, String.valueOf(SEPARATOR));
                         break;
+                    //When length is larger than 11, case 4
                     case 4:
                         phoneNumberEditable.delete(phoneNumberEditable.length() - 1, phoneNumberEditable.length());
                         break;
@@ -141,17 +137,17 @@ public class Register extends AppCompatActivity {
         }
 
         //When length equals to first separator index, add '-', case 2
-        if (phoneNumber.length() == FIRST_SEPERATOR_POSITION) {
+        if (phoneNumber.length() == FIRST_SEPARATOR_POSITION) {
             return 2;
         }
 
         //When length equals to second separator index, add '-', case 3
-        if (phoneNumber.length() == SECOND_SEPERATOR_POSITION) {
+        if (phoneNumber.length() == SECOND_SEPARATOR_POSITION) {
             return 3;
         }
 
         //When length is larger than 11, case 4
-        if (phoneNumber.length() > 11) {
+        if (phoneNumber.length() > 12) {
             return 4;
         }
 
@@ -163,13 +159,43 @@ public class Register extends AppCompatActivity {
             return -1;
         }
         for (int i = 0; i < phoneNumber.length(); i++) {
-            if (i == FIRST_SEPERATOR_POSITION || i == SECOND_SEPERATOR_POSITION) {
+            if (i == FIRST_SEPARATOR_POSITION || i == SECOND_SEPARATOR_POSITION) {
                 continue;
             }
-            if (phoneNumber.charAt(i) == '-') {
+            if (phoneNumber.charAt(i) == SEPARATOR) {
                 return i;
             }
         }
         return -1;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("onStart", "call onStart");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("onResume", "call onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("onPause", "call onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("onStop", "call onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("onDestroy", "call onDestroy");
     }
 }
