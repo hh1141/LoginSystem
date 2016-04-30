@@ -21,7 +21,6 @@ public class Register extends AppCompatActivity {
     private EditText name;
     private EditText phone;
     private DBHelper db;
-//    private boolean isRun = false;
     private static final char SEPARATOR = '-';
     private static final int FIRST_SEPARATOR_POSITION = 3;
     private static final int SECOND_SEPARATOR_POSITION = 7;
@@ -53,7 +52,11 @@ public class Register extends AppCompatActivity {
                     Toast.makeText(Register.this, "please enter your password", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                //if phone number is not in length of 12
+                if(!phone.getText().toString().equals("") && phone.getText().toString().length() != 12) {
+                    Toast.makeText(Register.this, "invalid phone format", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Pattern emailPattern = Pattern.compile(Values.emailPattern);
                 Matcher emailMatcher = emailPattern.matcher(email.getText());
                 //if email is in a validate format, insert data into database
@@ -82,11 +85,6 @@ public class Register extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if (isRun) {
-//                    isRun = false;
-//                    return;
-//                }
-//                isRun = true;
                 Editable phoneNumberEditable = phone.getEditableText();
                 Log.d("before", String.valueOf(before));
                 Log.d("count", String.valueOf(count));

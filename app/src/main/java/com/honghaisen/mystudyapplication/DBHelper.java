@@ -34,12 +34,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public boolean matches(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM Users WHERE email=? AND password=?", new String[]{email, password});
-        //debug
-        Cursor rs = getData(email);
-        String[] colName = rs.getColumnNames();
-        for(String col : colName) {
-            Log.d("register", col);
-        }
+
+
 
         return res.getCount() == 1;
     }

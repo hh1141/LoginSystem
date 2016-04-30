@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">My Study Application</string>
     <string name="title_activity_second">Second</string>
+    <string name="facebook_app_id">779286392201375</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

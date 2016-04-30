@@ -13,11 +13,22 @@
     tools:showIn="@layout/activity_second">
 
     <TextView
+        android:id="@+id/hello"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SecondActivity"
-        android:id="@+id/textView"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="113dp" />
+        android:textSize="16sp"
+        android:layout_marginTop="113dp"
+        android:text="SecondActivity" />
+
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/fbBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_below="@+id/hello"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        />
 </RelativeLayout>
