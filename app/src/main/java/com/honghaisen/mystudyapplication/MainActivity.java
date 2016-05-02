@@ -145,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LoginResult loginResult) {
 
-//                Intent i = new Intent(MainActivity.this, Second.class).putExtra("fb", true).putExtra(Values.USER_COLUMN_NAME, profile.getName());
-//                MainActivity.this.startActivity(i);
+
             }
 
             @Override

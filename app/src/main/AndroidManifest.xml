@@ -21,8 +21,8 @@
             android:name=".Second"
             android:label="@string/title_activity_second"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Register"></activity>
-
+        <activity android:name=".Register" />
+        <!-- what is this -->
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -32,7 +32,8 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
-    </application>
 
+        <activity android:name=".Completed"></activity>
+    </application>
 
 </manifest>
