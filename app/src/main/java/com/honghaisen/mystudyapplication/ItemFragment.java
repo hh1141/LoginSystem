@@ -95,6 +95,8 @@ public class ItemFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 db.insertItem(currentUser, item.getText().toString(), Integer.parseInt(quantity.getText().toString()), true);
+                fragmentTransaction.remove(ItemFragment.this);
+                fragmentTransaction.commit();
             }
         });
     }
