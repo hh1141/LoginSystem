@@ -16,15 +16,16 @@ import java.util.List;
 public class DBHelper extends SQLiteOpenHelper {
 
     public DBHelper(Context context) {
-        super(context, Values.DATABASE_NAME, null, 1);
+        super(context, Values.DATABASE_NAME, null, 6);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.d("onCreate", "table created");
+        db.execSQL("CREATE TABLE Items" +
+                "(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, item TEXT NOT NULL, quantity INTEGER NOT NULL, done BOOLEAN)");
         db.execSQL("CREATE TABLE Users" +
                 "(email TEXT PRIMARY KEY, password TEXT NOT NULL, name TEXT NOT NULL, phone TEXT)");
-        db.execSQL("CREATE TABLE Items" +
-                "(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, item TEXT NOT NULL, quantity INTEGER");
     }
 
     @Override

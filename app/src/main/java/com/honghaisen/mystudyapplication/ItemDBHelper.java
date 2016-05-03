@@ -16,7 +16,7 @@ public class ItemDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE ");
+//        db.execSQL("CREATE TABLE ");
     }
 
     @Override

@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         register = (Button) findViewById(R.id.register);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
+        Log.i("db", "MainActivity DB Created");
         db = new DBHelper(this);
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         callbackManager = CallbackManager.Factory.create();
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     temp.moveToFirst();
 
                     String name = temp.getString(temp.getColumnIndex(Values.USER_COLUMN_NAME));
-                    Intent i = new Intent(MainActivity.this, Second.class).putExtra(Values.USER_COLUMN_NAME, name).putExtra("fb", false);
+                    Intent i = new Intent(MainActivity.this, Second.class).putExtra(Values.USER_COLUMN_NAME, name).putExtra("email", email).putExtra("fb", false);
                     MainActivity.this.startActivity(i);
                 } else {
                     Toast.makeText(MainActivity.this, "Email or password not match", Toast.LENGTH_SHORT).show();

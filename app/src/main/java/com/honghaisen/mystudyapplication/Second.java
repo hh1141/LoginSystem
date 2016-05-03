@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -34,6 +35,7 @@ public class Second extends AppCompatActivity {
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         add = (Button) findViewById(R.id.addBtn);
         done = (Button) findViewById(R.id.done);
+        Log.d("db", "Created db");
         db = new DBHelper(this);
 
     }
@@ -41,7 +43,15 @@ public class Second extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        Bundle extras = getIntent().getExtras();
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final Bundle extras = getIntent().getExtras();
         boolean fb = extras.getBoolean("fb");
         if(fb) {
             fbBtn.setVisibility(View.VISIBLE);
@@ -52,22 +62,14 @@ public class Second extends AppCompatActivity {
         }
         greeting.setText("Hello, " + extras.getString(Values.USER_COLUMN_NAME));
 
-        //get All uncompleted item
-        List<Cursor> res = db.getAllUncompletedItems();
-        
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
         //clicker for add a new fragment
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                Fragment item = new ItemFragment();
+                ItemFragment item = new ItemFragment();
+                item.setCurrentUser(extras.getString("email"));
                 fragmentTransaction.add(R.id.fragmentContainer, item, item.toString());
                 fragmentTransaction.commit();
             }
@@ -81,6 +83,18 @@ public class Second extends AppCompatActivity {
             }
         });
 
+        //get and list All uncompleted item
+        List<Cursor> res = db.getAllCompletedItems();
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        for(Cursor cursor : res) {
+            ItemFragment currentFragment = new ItemFragment();
+            String item = cursor.getString(cursor.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
+            int num = cursor.getInt(cursor.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
+            currentFragment.setItemName(item);
+            currentFragment.setItemQuantity(num);
+            fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
+        }
 
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
