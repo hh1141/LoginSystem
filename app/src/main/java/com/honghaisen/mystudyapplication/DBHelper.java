@@ -76,41 +76,25 @@ public class DBHelper extends SQLiteOpenHelper {
         return false;
     }
 
-    public List<Cursor> getAllCompletedItems() {
-        List<Cursor> res = new ArrayList<Cursor>();
+    public Cursor getAllCompletedItems() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Items WHERE done=?", new String[]{String.valueOf(true)});
+        Cursor c = db.rawQuery("SELECT * FROM Items WHERE done=1", null);
         c.moveToFirst();
-        while(!c.isAfterLast()) {
-            res.add(c);
-            c.moveToNext();
-        }
-        return res;
+        return c;
     }
 
-    public List<Cursor> getAllUncompletedItems() {
-        List<Cursor> res = new ArrayList<Cursor>();
+    public Cursor getAllUncompletedItems() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Items WHERE done=?", new String[]{String.valueOf(false)});
+        Cursor c = db.rawQuery("SELECT * FROM Items WHERE done=0", null);
         c.moveToFirst();
-        while(!c.isAfterLast()) {
-            res.add(c);
-            c.moveToNext();
-        }
-        return res;
+        return c;
     }
 
-    public List<Cursor> getAll() {
-        List<Cursor> res = new ArrayList<Cursor>();
+    public Cursor getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM Users", null);
         c.moveToFirst();
-        while(!c.isAfterLast()) {
-            Log.d("register", c.getString(c.getColumnIndex(Values.USER_COLUMN_EMAIL)));
-            res.add(c);
-            c.moveToNext();
-        }
-        return res;
+        return c;
     }
 
     public Cursor getData(String email) {

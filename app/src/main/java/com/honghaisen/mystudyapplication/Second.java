@@ -25,6 +25,8 @@ public class Second extends AppCompatActivity {
     private Button add;
     private Button done;
     private DBHelper db;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class Second extends AppCompatActivity {
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         add = (Button) findViewById(R.id.addBtn);
         done = (Button) findViewById(R.id.done);
+        fragmentManager = getFragmentManager();
         Log.d("db", "Created db");
         db = new DBHelper(this);
 
@@ -53,10 +56,10 @@ public class Second extends AppCompatActivity {
 
         final Bundle extras = getIntent().getExtras();
         boolean fb = extras.getBoolean("fb");
-        if(fb) {
+        if (fb) {
             fbBtn.setVisibility(View.VISIBLE);
         }
-        if(extras.get(Values.USER_COLUMN_NAME) == null) {
+        if (extras.get(Values.USER_COLUMN_NAME) == null) {
             greeting.setText("Hello");
             return;
         }
@@ -70,7 +73,7 @@ public class Second extends AppCompatActivity {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 ItemFragment item = new ItemFragment();
                 item.setCurrentUser(extras.getString("email"));
-                fragmentTransaction.add(R.id.fragmentContainer, item, item.toString());
+                fragmentTransaction.add(R.id.fragmentContainer, item);
                 fragmentTransaction.commit();
             }
         });
@@ -79,27 +82,30 @@ public class Second extends AppCompatActivity {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent i = new Intent(Second.this, Completed.class);
+                Second.this.startActivity(i);
             }
         });
 
         //get and list All uncompleted item
-        List<Cursor> res = db.getAllCompletedItems();
+        Cursor res = db.getAllUncompletedItems();
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        for(Cursor cursor : res) {
+        while (!res.isAfterLast()) {
             ItemFragment currentFragment = new ItemFragment();
-            String item = cursor.getString(cursor.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
-            int num = cursor.getInt(cursor.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
+            String item = res.getString(res.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
+            int num = res.getInt(res.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
             currentFragment.setItemName(item);
             currentFragment.setItemQuantity(num);
             fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
+            res.moveToNext();
         }
+        fragmentTransaction.commit();
 
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
             protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                if(currentAccessToken == null) {
+                if (currentAccessToken == null) {
                     Intent i = new Intent(Second.this, MainActivity.class);
                     Second.this.startActivity(i);
                 }

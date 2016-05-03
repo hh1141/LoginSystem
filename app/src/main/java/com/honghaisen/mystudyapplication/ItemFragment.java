@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,6 @@ public class ItemFragment extends Fragment {
         quantity = (EditText) view.findViewById(R.id.quantity);
         db = new DBHelper(getActivity());
         fragmentManager = getFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
         fragments = new ArrayList<Fragment>();
 
         return view;
@@ -86,6 +86,7 @@ public class ItemFragment extends Fragment {
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.remove(ItemFragment.this);
                 fragmentTransaction.commit();
             }
@@ -94,7 +95,9 @@ public class ItemFragment extends Fragment {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.insertItem(currentUser, item.getText().toString(), Integer.parseInt(quantity.getText().toString()), true);
+                boolean res = db.insertItem(currentUser, item.getText().toString(), Integer.parseInt(quantity.getText().toString()), true);
+                Log.d("res", String.valueOf(res));
+                fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.remove(ItemFragment.this);
                 fragmentTransaction.commit();
             }
