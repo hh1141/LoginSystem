@@ -1,6 +1,8 @@
 package com.honghaisen.mystudyapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.honghaisen.mystudyapplication.Users.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +25,7 @@ public class Register extends AppCompatActivity {
     private EditText name;
     private EditText phone;
     private DBHelper db;
+    private SharedPreferences sharedPreferences;
     private static final char SEPARATOR = '-';
     private static final int FIRST_SEPARATOR_POSITION = 3;
     private static final int SECOND_SEPARATOR_POSITION = 7;
@@ -37,6 +42,7 @@ public class Register extends AppCompatActivity {
         name = (EditText) findViewById(R.id.regName);
         phone = (EditText) findViewById(R.id.regPhone);
         db = new DBHelper(this);
+        sharedPreferences = getSharedPreferences("Users", Context.MODE_PRIVATE);
 
         //click to do validation and database insertion operation
         regBtn.setOnClickListener(new View.OnClickListener() {
@@ -61,13 +67,20 @@ public class Register extends AppCompatActivity {
                 Matcher emailMatcher = emailPattern.matcher(email.getText());
                 //if email is in a validate format, insert data into database
                 if (emailMatcher.matches()) {
-                    boolean successInsert = db.insert(email.getText().toString(), password.getText().toString(), name.getText().toString(), phone.getText().toString());
-                    if (successInsert) {
-                        Intent i = new Intent(Register.this, MainActivity.class);
-                        Register.this.startActivity(i);
-                    } else {
-                        Toast.makeText(Register.this, "email address duplication", Toast.LENGTH_SHORT).show();
-                    }
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    User user = new User(email.getText().toString(), password.getText().toString(),
+//                                         name.getText().toString(), phone.getText().toString());
+                    editor.putString(email.getText().toString(), password.getText().toString());
+                    editor.commit();
+                    Intent i = new Intent(Register.this, MainActivity.class);
+                    Register.this.startActivity(i);
+//                    boolean successInsert = db.insert(email.getText().toString(), password.getText().toString(), name.getText().toString(), phone.getText().toString());
+//                    if (successInsert) {
+//                        Intent i = new Intent(Register.this, MainActivity.class);
+//                        Register.this.startActivity(i);
+//                    } else {
+//                        Toast.makeText(Register.this, "email address duplication", Toast.LENGTH_SHORT).show();
+//                    }
                 }
                 //if email address's format is invalid
                 else {

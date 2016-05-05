@@ -98,23 +98,6 @@ public class Second extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(extras != null && extras.get("email") != null) {
-            email = extras.getString("email");
-        }
-        if(extras != null && extras.get("fb") != null) {
-            fb = extras.getBoolean("fb");
-        }
-        if(extras != null && extras.get(Values.USER_COLUMN_NAME) != null) {
-            name = extras.getString(Values.USER_COLUMN_NAME);
-        }
-        if (fb) {
-            fbBtn.setVisibility(View.VISIBLE);
-        }
-        if (name == null || name.length() == 0) {
-            greeting.setText("Hello");
-            return;
-        }
-        greeting.setText("Hello, " + name);
 
         //clicker for add a new fragment
         add.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +146,7 @@ public class Second extends AppCompatActivity {
                     fragmentTransaction.remove(fragment);
                 }
                 fragmentTransaction.commit();
-                for(int i = 0; i < completedList.size(); i++) {
+                for (int i = 0; i < completedList.size(); i++) {
                     fragmentTransaction = fragmentManager.beginTransaction();
                     ShowItemFragment showItemFragment = completedList.get(i);
                     fragmentTransaction.add(R.id.fragmentContainer, showItemFragment);
@@ -186,6 +169,26 @@ public class Second extends AppCompatActivity {
                 }
             }
         };
+
+        if(extras != null && extras.get("email") != null) {
+            email = extras.getString("email");
+        }
+        if(extras != null && extras.get("fb") != null) {
+            fb = extras.getBoolean("fb");
+        }
+        if(extras != null && extras.get(Values.USER_COLUMN_NAME) != null) {
+            name = extras.getString(Values.USER_COLUMN_NAME);
+        }
+        if (fb) {
+            fbBtn.setVisibility(View.VISIBLE);
+        }
+        if (name == null || name.length() == 0) {
+            greeting.setText("Hello");
+            return;
+        }
+        greeting.setText("Hello, " + name);
+
+
     }
 
     public List<ItemFragment> getFragmentList() {

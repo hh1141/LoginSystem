@@ -24,20 +24,20 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.d("onCreate", "table created");
         db.execSQL("CREATE TABLE Items" +
                 "(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, item TEXT NOT NULL, quantity INTEGER NOT NULL, done BOOLEAN)");
-        db.execSQL("CREATE TABLE Users" +
+        db.execSQL("CREATE TABLE User" +
                 "(email TEXT PRIMARY KEY, password TEXT NOT NULL, name TEXT NOT NULL, phone TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS Users");
+        db.execSQL("DROP TABLE IF EXISTS User");
         db.execSQL("DROP TABLE IF EXISTS Items");
         onCreate(db);
     }
 
     public boolean matches(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM Users WHERE email=? AND password=?", new String[]{email, password});
+        Cursor res = db.rawQuery("SELECT * FROM User WHERE email=? AND password=?", new String[]{email, password});
         return res.getCount() == 1;
     }
 
@@ -63,8 +63,8 @@ public class DBHelper extends SQLiteOpenHelper {
         content.put(Values.USER_COLUMN_PASS, password);
         content.put(Values.USER_COLUMN_NAME, name);
         content.put(Values.USER_COLUMN_PHONE, phone);
-        long before = db.rawQuery("SELECT * FROM Users", null).getCount();
-        long after = db.insert("Users", null, content);
+        long before = db.rawQuery("SELECT * FROM User", null).getCount();
+        long after = db.insert("User", null, content);
         //debug
 //        getAll();
         Log.d("num of res before", String.valueOf(before));
@@ -92,14 +92,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public Cursor getAll() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM Users", null);
+        Cursor c = db.rawQuery("SELECT * FROM User", null);
         c.moveToFirst();
         return c;
     }
 
     public Cursor getData(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM Users WHERE email=?", new String[]{email});
+        Cursor res = db.rawQuery("SELECT * FROM User WHERE email=?", new String[]{email});
         return res;
     }
 
@@ -116,7 +116,7 @@ public class DBHelper extends SQLiteOpenHelper {
         content.put(Values.USER_COLUMN_PASS, password);
         content.put(Values.USER_COLUMN_NAME, name);
         content.put(Values.USER_COLUMN_PHONE, phone);
-        db.update("Users", content, "email = ?", new String[]{email});
+        db.update("User", content, "email = ?", new String[]{email});
     }
 
     public void deleteItem(int id) {
@@ -126,6 +126,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void delete(String email) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("Users", "email = ?", new String[]{email});
+        db.delete("User", "email = ?", new String[]{email});
     }
 }

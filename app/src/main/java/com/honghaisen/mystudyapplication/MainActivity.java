@@ -1,6 +1,8 @@
 package com.honghaisen.mystudyapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,7 +29,6 @@ import com.facebook.login.widget.LoginButton;
 import org.json.JSONObject;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private AccessToken accessToken;
     private ProfileTracker profileTracker;
     private AccessTokenTracker accessTokenTracker;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         register = (Button) findViewById(R.id.register);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
-        Log.i("db", "MainActivity DB Created");
+        sharedPreferences = getSharedPreferences("Users", Context.MODE_PRIVATE);
         db = new DBHelper(this);
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         callbackManager = CallbackManager.Factory.create();
@@ -113,16 +115,22 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String email = MainActivity.this.email.getText().toString();
                 String password = MainActivity.this.password.getText().toString();
-                if (db.matches(email, password)) {
-                    Cursor temp = db.getData(email);
-                    temp.moveToFirst();
-
-                    String name = temp.getString(temp.getColumnIndex(Values.USER_COLUMN_NAME));
-                    Intent i = new Intent(MainActivity.this, Second.class).putExtra(Values.USER_COLUMN_NAME, name).putExtra("email", email).putExtra("fb", false);
+                if (sharedPreferences.getString(email, null) != null && sharedPreferences.getString(email, null).equals(password)) {
+                    Intent i = new Intent(MainActivity.this, Second.class).putExtra("email", email).putExtra("fb", false);
                     MainActivity.this.startActivity(i);
                 } else {
                     Toast.makeText(MainActivity.this, "Email or password not match", Toast.LENGTH_SHORT).show();
                 }
+//                if (db.matches(email, password)) {
+//                    Cursor temp = db.getData(email);
+//                    temp.moveToFirst();
+//
+//                    String name = temp.getString(temp.getColumnIndex(Values.USER_COLUMN_NAME));
+//                    Intent i = new Intent(MainActivity.this, Second.class).putExtra(Values.USER_COLUMN_NAME, name).putExtra("email", email).putExtra("fb", false);
+//                    MainActivity.this.startActivity(i);
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Email or password not match", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 
@@ -186,4 +194,5 @@ public class MainActivity extends AppCompatActivity {
         accessTokenTracker.stopTracking();
         profileTracker.stopTracking();
     }
+
 }
