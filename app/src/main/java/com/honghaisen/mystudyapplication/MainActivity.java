@@ -1,13 +1,9 @@
 package com.honghaisen.mystudyapplication;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,16 +16,16 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.Profile;
 import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginBehavior;
-import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.json.JSONObject;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -84,11 +80,11 @@ public class MainActivity extends AppCompatActivity {
         profileTracker = new ProfileTracker() {
             @Override
             protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                Intent i = new Intent(MainActivity.this, Second.class).putExtra("fb", true);
-                if(currentProfile != null) {
-                    i.putExtra(Values.USER_COLUMN_NAME, currentProfile.getName());
-                    MainActivity.this.startActivity(i);
-                }
+//                Intent i = new Intent(MainActivity.this, Second.class).putExtra("fb", true);
+//                if(currentProfile != null) {
+//                    i.putExtra(Values.USER_COLUMN_NAME, currentProfile.getName()).putExtra(Values.USER_COLUMN_EMAIL, currentProfile.);
+//                    MainActivity.this.startActivity(i);
+//                }
 
             }
         };
@@ -145,8 +141,26 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(LoginResult loginResult) {
+                String accessToken = loginResult.getAccessToken().getToken();
 
+                GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
 
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        Intent i = new Intent(MainActivity.this, Second.class);
+                        Profile profile = Profile.getCurrentProfile();
+                        try {
+                            i.putExtra(Values.USER_COLUMN_NAME, profile.getName()).putExtra("fb", true).putExtra(Values.USER_COLUMN_EMAIL, object.getString(Values.USER_COLUMN_EMAIL));
+                        } catch (Exception e) {
+                            Log.e("JsonException", e.toString());
+                        }
+                        MainActivity.this.startActivity(i);
+                    }
+                });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "email");
+                request.setParameters(parameters);
+                request.executeAsync();
             }
 
             @Override

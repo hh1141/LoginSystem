@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.honghaisen.mystudyapplication.dummy.DummyContent.DummyItem;
 
@@ -28,13 +29,15 @@ public class ItemFragment extends Fragment {
 
     private Button remove;
     private Button ok;
-    private EditText item;
-    private EditText quantity;
+    private TextView item;
+    private TextView quantity;
     private DBHelper db;
     private String currentUser;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
-    private List<Fragment> fragments;
+    private int num;
+    private String itemName;
+    private int id;
 
     public ItemFragment() {
     }
@@ -46,11 +49,10 @@ public class ItemFragment extends Fragment {
 
         remove = (Button) view.findViewById(R.id.remove);
         ok = (Button) view.findViewById(R.id.ok);
-        item = (EditText) view.findViewById(R.id.itemName);
-        quantity = (EditText) view.findViewById(R.id.quantity);
+        item = (TextView) view.findViewById(R.id.showItemName);
+        quantity = (TextView) view.findViewById(R.id.showItemQuantity);
         db = new DBHelper(getActivity());
         fragmentManager = getFragmentManager();
-        fragments = new ArrayList<Fragment>();
 
         return view;
     }
@@ -60,11 +62,15 @@ public class ItemFragment extends Fragment {
     }
 
     public void setItemName(String name) {
-        this.item.setText(name);
+        itemName = name;
     }
 
     public void setItemQuantity(int num) {
-        this.quantity.setText(String.valueOf(num));
+        this.num = num;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -86,6 +92,7 @@ public class ItemFragment extends Fragment {
         remove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                db.deleteItem(id);
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.remove(ItemFragment.this);
                 fragmentTransaction.commit();
@@ -95,13 +102,15 @@ public class ItemFragment extends Fragment {
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean res = db.insertItem(currentUser, item.getText().toString(), Integer.parseInt(quantity.getText().toString()), true);
-                Log.d("res", String.valueOf(res));
+                db.updateItem(id, true);
                 fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.remove(ItemFragment.this);
                 fragmentTransaction.commit();
             }
         });
+
+        item.setText(itemName);
+        quantity.setText(String.valueOf(num));
     }
 
     @Override

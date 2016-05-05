@@ -29,6 +29,8 @@ public class Completed extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        //get completed item
         Cursor items = db.getAllCompletedItems();
         while(!items.isAfterLast()) {
             String itemName = items.getString(items.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));

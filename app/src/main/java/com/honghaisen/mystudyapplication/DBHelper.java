@@ -119,6 +119,11 @@ public class DBHelper extends SQLiteOpenHelper {
         db.update("Users", content, "email = ?", new String[]{email});
     }
 
+    public void deleteItem(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("Items", "id=?", new String[]{String.valueOf(id)});
+    }
+
     public void delete(String email) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("Users", "email = ?", new String[]{email});

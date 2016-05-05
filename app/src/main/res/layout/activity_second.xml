@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Done" />
+            android:text="Bought" />
 
         <Button
             android:id="@+id/addBtn"
@@ -44,13 +44,18 @@
         android:layout_height="wrap_content"
         android:visibility="invisible" />
 
-    <LinearLayout
-        android:id="@+id/fragmentContainer"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </LinearLayout>
+    </ScrollView>
 
 
 </LinearLayout>

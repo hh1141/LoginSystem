@@ -16,7 +16,7 @@ import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.login.widget.LoginButton;
 
-import java.util.List;
+
 
 public class Second extends AppCompatActivity {
 
@@ -26,7 +26,10 @@ public class Second extends AppCompatActivity {
     private Button done;
     private DBHelper db;
     private FragmentManager fragmentManager;
-    private FragmentTransaction fragmentTransaction;
+    private static boolean fb;
+    private Bundle extras;
+    private static String name;
+    private static String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,44 +40,54 @@ public class Second extends AppCompatActivity {
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         add = (Button) findViewById(R.id.addBtn);
         done = (Button) findViewById(R.id.done);
-        fragmentManager = getFragmentManager();
         Log.d("db", "Created db");
         db = new DBHelper(this);
-
+        extras = getIntent().getExtras();
+        Log.d("onCreate", "onCreate");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
+        Log.d("onStart", "onStart");
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        final Bundle extras = getIntent().getExtras();
-        boolean fb = extras.getBoolean("fb");
+        if(extras != null && extras.get("email") != null) {
+            email = extras.getString("email");
+        }
+        if(extras != null && extras.get("fb") != null) {
+            fb = extras.getBoolean("fb");
+        }
+        if(extras != null && extras.get(Values.USER_COLUMN_NAME) != null) {
+            name = extras.getString(Values.USER_COLUMN_NAME);
+        }
         if (fb) {
             fbBtn.setVisibility(View.VISIBLE);
         }
-        if (extras.get(Values.USER_COLUMN_NAME) == null) {
+        if (name == null || name.length() == 0) {
             greeting.setText("Hello");
             return;
         }
-        greeting.setText("Hello, " + extras.getString(Values.USER_COLUMN_NAME));
+        greeting.setText("Hello, " + name);
 
         //clicker for add a new fragment
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                ItemFragment item = new ItemFragment();
-                item.setCurrentUser(extras.getString("email"));
-                fragmentTransaction.add(R.id.fragmentContainer, item);
-                fragmentTransaction.commit();
+
+                Intent i = new Intent(Second.this, Add.class).putExtra(Values.USER_COLUMN_EMAIL, email);
+                Second.this.startActivity(i);
+//                fragmentManager = getFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                ItemFragment item = new ItemFragment();
+//                item.setCurrentUser(extras.getString("email"));
+//                fragmentTransaction.add(R.id.fragmentContainer, item);
+//                fragmentTransaction.commit();
             }
         });
 
@@ -88,15 +101,20 @@ public class Second extends AppCompatActivity {
         });
 
         //get and list All uncompleted item
+        Log.d("onResume", "onResume");
         Cursor res = db.getAllUncompletedItems();
-        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         while (!res.isAfterLast()) {
             ItemFragment currentFragment = new ItemFragment();
             String item = res.getString(res.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
             int num = res.getInt(res.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
+            int id = res.getInt(res.getColumnIndex("id"));
+            Log.d("item", item);
+            Log.d("item", String.valueOf(num));
             currentFragment.setItemName(item);
             currentFragment.setItemQuantity(num);
+            currentFragment.setId(id);
             fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
             res.moveToNext();
         }
@@ -111,5 +129,11 @@ public class Second extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
     }
 }
