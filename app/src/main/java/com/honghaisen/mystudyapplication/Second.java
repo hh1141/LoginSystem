@@ -10,12 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.login.widget.LoginButton;
+import com.honghaisen.mystudyapplication.fragments.AddFragment;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class Second extends AppCompatActivity {
@@ -30,6 +35,9 @@ public class Second extends AppCompatActivity {
     private Bundle extras;
     private static String name;
     private static String email;
+    private boolean bought;
+    private List<ItemFragment> fragmentList;
+    private List<ShowItemFragment> completedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +48,11 @@ public class Second extends AppCompatActivity {
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
         add = (Button) findViewById(R.id.addBtn);
         done = (Button) findViewById(R.id.done);
-        Log.d("db", "Created db");
+        fragmentList = new LinkedList<ItemFragment>();
+        completedList = new LinkedList<ShowItemFragment>();
         db = new DBHelper(this);
         extras = getIntent().getExtras();
+        bought = false;
         Log.d("onCreate", "onCreate");
     }
 
@@ -51,7 +61,38 @@ public class Second extends AppCompatActivity {
         super.onStart();
 
         Log.d("onStart", "onStart");
+        fragmentManager = getFragmentManager();
 
+        //get and list All uncompleted items
+        Cursor res = db.getAllUncompletedItems();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        while (!res.isAfterLast()) {
+            ItemFragment currentFragment = new ItemFragment();
+            String item = res.getString(res.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
+            int num = res.getInt(res.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
+            int id = res.getInt(res.getColumnIndex("id"));
+            Log.d("item", item);
+            Log.d("item", String.valueOf(num));
+            currentFragment.setItemName(item);
+            currentFragment.setItemQuantity(num);
+            currentFragment.setId(id);
+            fragmentList.add(currentFragment);
+            fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
+            res.moveToNext();
+        }
+        fragmentTransaction.commit();
+
+        //get all completed items
+        Cursor items = db.getAllCompletedItems();
+        while (!items.isAfterLast()) {
+            String itemName = items.getString(items.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
+            String itemQuantity = items.getString(items.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
+            ShowItemFragment cur = new ShowItemFragment();
+            cur.setItemName(itemName);
+            cur.setItemQuantity(itemQuantity);
+            items.moveToNext();
+            completedList.add(cur);
+        }
     }
 
     @Override
@@ -79,15 +120,32 @@ public class Second extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                if(bought) {
+                    bought = false;
+                    for(ShowItemFragment currentFragment : completedList) {
+                        fragmentTransaction.remove(currentFragment);
+                    }
+                    fragmentTransaction.commit();
 
-                Intent i = new Intent(Second.this, Add.class).putExtra(Values.USER_COLUMN_EMAIL, email);
-                Second.this.startActivity(i);
-//                fragmentManager = getFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//                ItemFragment item = new ItemFragment();
-//                item.setCurrentUser(extras.getString("email"));
-//                fragmentTransaction.add(R.id.fragmentContainer, item);
-//                fragmentTransaction.commit();
+                    for(int i = 0; i < fragmentList.size(); i++) {
+                        fragmentTransaction = fragmentManager.beginTransaction();
+                        ItemFragment currentFragment = fragmentList.get(i);
+                        fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
+                        fragmentTransaction.commit();
+                    }
+                    LinearLayout linearLayout = (LinearLayout) findViewById(R.id.addContainer);
+                    linearLayout.setVisibility(View.VISIBLE);
+
+                }
+                else {
+                    Bundle extras = new Bundle();
+                    extras.putString(Values.ITEM_COLUMN_EMAIL, email);
+                    AddFragment fragment = new AddFragment();
+                    fragment.setArguments(extras);
+                    fragmentTransaction.add(R.id.addContainer, fragment);
+                    fragmentTransaction.commit();
+                }
             }
         });
 
@@ -95,30 +153,29 @@ public class Second extends AppCompatActivity {
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Second.this, Completed.class);
-                Second.this.startActivity(i);
+                if (bought) {
+                    Log.d("bought", "bought");
+                    return;
+                }
+                bought = true;
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                for (ItemFragment fragment : fragmentList) {
+                    fragmentTransaction.remove(fragment);
+                }
+                fragmentTransaction.commit();
+                for(int i = 0; i < completedList.size(); i++) {
+                    fragmentTransaction = fragmentManager.beginTransaction();
+                    ShowItemFragment showItemFragment = completedList.get(i);
+                    fragmentTransaction.add(R.id.fragmentContainer, showItemFragment);
+                    fragmentTransaction.commit();
+                }
+                LinearLayout addLayout = (LinearLayout) findViewById(R.id.addContainer);
+                addLayout.setVisibility(View.INVISIBLE);
+//                Intent i = new Intent(Second.this, Completed.class);
+//                Second.this.startActivity(i);
+
             }
         });
-
-        //get and list All uncompleted item
-        Log.d("onResume", "onResume");
-        Cursor res = db.getAllUncompletedItems();
-        fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        while (!res.isAfterLast()) {
-            ItemFragment currentFragment = new ItemFragment();
-            String item = res.getString(res.getColumnIndex(Values.ITEM_COLUMN_ITEM_NAME));
-            int num = res.getInt(res.getColumnIndex(Values.ITEM_COLUMN_QUANTITY));
-            int id = res.getInt(res.getColumnIndex("id"));
-            Log.d("item", item);
-            Log.d("item", String.valueOf(num));
-            currentFragment.setItemName(item);
-            currentFragment.setItemQuantity(num);
-            currentFragment.setId(id);
-            fragmentTransaction.add(R.id.fragmentContainer, currentFragment);
-            res.moveToNext();
-        }
-        fragmentTransaction.commit();
 
         AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
             @Override
@@ -131,9 +188,12 @@ public class Second extends AppCompatActivity {
         };
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-
+    public List<ItemFragment> getFragmentList() {
+        return this.fragmentList;
     }
+
+    public List<ShowItemFragment> getCompletedList() {
+        return this.completedList;
+    }
+
 }
