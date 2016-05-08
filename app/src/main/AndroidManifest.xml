@@ -35,6 +35,9 @@
 
         <activity android:name=".Completed" />
         <activity android:name=".Add"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="9d69b403c383ceae2a6cfbcad3d01ac133b922be" />
     </application>
 
 </manifest>

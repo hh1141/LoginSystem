@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.ndk.CrashlyticsNdk;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -25,11 +27,25 @@ import com.facebook.ProfileTracker;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "bHp2pwLo5rYOCm3lKfClHoNmK";
+    private static final String TWITTER_SECRET = "qMSVEAhnAoh5WJg85r6kgkpobMWXo2c2U5CevUngKNk7tD6l1G";
+
 
 
     private Button register;
@@ -43,10 +59,13 @@ public class MainActivity extends AppCompatActivity {
     private ProfileTracker profileTracker;
     private AccessTokenTracker accessTokenTracker;
     private SharedPreferences sharedPreferences;
+    private TwitterLoginButton twitterBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Crashlytics(), new CrashlyticsNdk(), new Twitter(authConfig));
 
         //FaceBook sdk initialization
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -59,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         register = (Button) findViewById(R.id.register);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
+        twitterBtn = (TwitterLoginButton) findViewById(R.id.twitterBtn);
         sharedPreferences = getSharedPreferences("Users", Context.MODE_PRIVATE);
         db = new DBHelper(this);
         fbBtn = (LoginButton) findViewById(R.id.fbBtn);
@@ -144,6 +164,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //clicker for twitter login
+        twitterBtn.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                String name = session.getUserName();
+                String email = null;
+                TwitterAuthClient authClient = new TwitterAuthClient();
+                authClient.requestEmail(session, new Callback<String>() {
+                    @Override
+                    public void success(Result<String> result) {
+                        Log.d("twitter", "email");
+                        Log.d("twitter", result.data);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+                        Log.d("twitter", "deny");
+                    }
+                });
+                Intent i = new Intent(MainActivity.this, Second.class);
+                i.putExtra("fb", false);
+                i.putExtra(Values.USER_COLUMN_NAME, name);
+                //must be modified after get permission
+                i.putExtra(Values.USER_COLUMN_EMAIL, "hison7463@gmail.com");
+                MainActivity.this.startActivity(i);
+            }
+
+            @Override
+            public void failure(TwitterException exception) {
+                Log.d("twitter", "failure");
+            }
+        });
+
         //clicker for FB login
         fbBtn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
@@ -186,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
+        twitterBtn.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
