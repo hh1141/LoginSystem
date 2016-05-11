@@ -43,13 +43,21 @@
             android:text="Registration" />
     </LinearLayout>
 
+    <Button
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/goBtn"
+        android:layout_marginTop="40dp"
+        android:text="Go"
+        android:background="@drawable/circular_button"
+        android:layout_gravity="center_horizontal"/>
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/fbBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp" />
+        android:layout_marginTop="10dp" />
 
     <com.twitter.sdk.android.core.identity.TwitterLoginButton
         android:id="@+id/twitterBtn"

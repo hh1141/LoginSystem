@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private AccessTokenTracker accessTokenTracker;
     private SharedPreferences sharedPreferences;
     private TwitterLoginButton twitterBtn;
+    private Button goBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         //instantiate widgets
         login = (Button) findViewById(R.id.login);
+        goBtn = (Button) findViewById(R.id.goBtn);
         register = (Button) findViewById(R.id.register);
         email = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -164,6 +166,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //clicker for google map
+        goBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, MapsActivity.class);
+                MainActivity.this.startActivity(i);
+            }
+        });
+
         //clicker for twitter login
         twitterBtn.setCallback(new Callback<TwitterSession>() {
             @Override
@@ -172,18 +183,18 @@ public class MainActivity extends AppCompatActivity {
                 String name = session.getUserName();
                 String email = null;
                 TwitterAuthClient authClient = new TwitterAuthClient();
-                authClient.requestEmail(session, new Callback<String>() {
-                    @Override
-                    public void success(Result<String> result) {
-                        Log.d("twitter", "email");
-                        Log.d("twitter", result.data);
-                    }
-
-                    @Override
-                    public void failure(TwitterException exception) {
-                        Log.d("twitter", "deny");
-                    }
-                });
+//                authClient.requestEmail(session, new Callback<String>() {
+//                    @Override
+//                    public void success(Result<String> result) {
+//                        Log.d("twitter", "email");
+//                        Log.d("twitter", result.data);
+//                    }
+//
+//                    @Override
+//                    public void failure(TwitterException exception) {
+//                        Log.d("twitter", "deny");
+//                    }
+//                });
                 Intent i = new Intent(MainActivity.this, Second.class);
                 i.putExtra("fb", false);
                 i.putExtra(Values.USER_COLUMN_NAME, name);

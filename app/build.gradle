@@ -17,8 +17,8 @@ apply plugin: 'io.fabric'
 
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion '22.0.1'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
 
     repositories {
         mavenCentral()
@@ -29,8 +29,8 @@ android {
 
     defaultConfig {
         applicationId "com.honghaisen.mystudyapplication"
-        minSdkVersion 15
-        targetSdkVersion 22
+        minSdkVersion 19
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -45,10 +45,6 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'com.android.support:design:22.2.1'
-    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
-    compile 'com.android.support:support-v4:22.2.1'
     compile('com.twitter.sdk.android:twitter:1.13.1@aar') {
         transitive = true;
     }
@@ -58,6 +54,13 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics-ndk:1.1.2@aar') {
         transitive = true;
     }
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:design:23.3.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.6.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile project(":volley")
 }
 
 crashlytics {

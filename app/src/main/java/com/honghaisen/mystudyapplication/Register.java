@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.honghaisen.mystudyapplication.Users.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

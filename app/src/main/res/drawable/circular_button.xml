@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android" >
-            <solid
-                android:centerColor="#90150517"
-                android:endColor="#10350917"
-                android:startColor="#90359519" />
+        <shape android:shape="oval">
+            <gradient android:centerColor="#234512" android:endColor="#690644" android:startColor="#990000" />
         </shape>
+
     </item>
+    <!--<item android:state_pressed="true">-->
+    <!--<shape android:shape="oval">-->
+    <!--<solid android:color="#c20586"/>-->
+    <!--</shape>-->
+    <!--</item>-->
 
 </selector>
