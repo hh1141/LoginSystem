@@ -115,7 +115,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String url = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition.text%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22" + address.get(0).getLocality() + "%2C%20" + address.get(0).getAdminArea() + "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
+                String url = "https://query.yahooapis.com/v1/public/yql?q=select%20item.condition.text%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22" + address.get(0).getLocality() + "%2C%20" + address.get(0).getAdminArea().substring(0, 2) + "%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys";
                 StringRequest stringRequest = new StringRequest(url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
